@@ -23,5 +23,5 @@ Common lables
 {{- define "myapp.labels" -}}
 helm.sh/chart: {{ include "myapp.name" . }} - {{ .Chart.Version | replace "+" "-" }}
 app.kubernetes.io/managed-by: {{ .Release.service }}
-app.kubernetes.io/part-of: {{ .Chart.name }}
+app.kubernetes.io/part-of: {{ .Chart.Name }}
 {{- end }}
