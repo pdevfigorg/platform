@@ -1,0 +1,20 @@
+Namespace
+
+Backend:
+  security context
+  probes
+- deployment
+  - env
+  - configmap
+  - secret
+  
+- service
+  - target port 80
+  - port 80
+
+Frontend
+  security context and probes
+- deployment
+- service
+  - targetport 9000
+  - port 9000
