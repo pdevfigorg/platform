@@ -12,7 +12,7 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailabel: 0
+      maxUnavailable: 0
       maxSurge: 1
 
   selector:
