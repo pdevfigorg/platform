@@ -48,51 +48,51 @@ spec:
       labels:
         app.kubernetes.io/name: backend
         app.kubernetes.io/part-of: myapp
-      spec:
-        containers:
-          - name: backend
-            image: pdevfig/temp-api:0.1.1
-            ports:
-              - name: http
-                containerPort: 80
-                protocol: TCP
-            startupProbe:
-              httpGet:
-                path: /healthz
-                port: http
-              periodSeconds: 5
-              failureThreshold: 30
+    spec:
+      containers:
+        - name: backend
+          image: pdevfig/temp-api:0.1.1
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 30
 
-            readinessProbe:
-              httpGet:
-                path: /healthz
-                port: http
-              periodSeconds: 10
-              timeoutSeconds: 2
-              failureThreshold: 3
-            
-            livenessProbe:
-              httpGet:
-                path: /healthz
-                port: http
-              periodSeconds: 20
-              timeoutSeconds: 2
-              failureThreshold: 3
-            
-            resources:
-              requests:
-                cpu: 100m
-                memory: 128Mi
-              limits:
-                cpu: 400m
-                memory: 512Mi
-            
-            securityContext:
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                  - ALL
-              runAsNonRoot: True
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+          
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 400m
+              memory: 512Mi
+          
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: True
 ---
 # frontend service
 apiVersion: v1
