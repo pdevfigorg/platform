@@ -156,7 +156,7 @@ spec:
             capabilities:
               drop:
                 - ALL
-            runAsNonRoot: true
+            # runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
           
