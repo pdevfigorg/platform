@@ -25,7 +25,7 @@ spec:
         - path:
             type: Exact
             value: /
-      backendRef:
+      backendRefs:
         - name: frontend
           port: 80
     - matches:
