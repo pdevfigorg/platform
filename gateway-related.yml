@@ -23,7 +23,7 @@ spec:
     # exact match
     - matches:
         - path:
-            type: Exact
+            type: PathPrefix 
             value: /
       backendRefs:
         - name: frontend
@@ -31,7 +31,7 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /
+            value: /api
       backendRefs:
         - name: backend
           port: 9000
