@@ -54,7 +54,7 @@ spec:
           image: pdevfig/temp-api-dhi:0.1.1
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 9000
               protocol: TCP
           startupProbe:
             httpGet:
