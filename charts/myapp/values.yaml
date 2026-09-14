@@ -1,0 +1,101 @@
+nameOverride: ""
+fullnameOverride: ""
+
+frontend:
+  replicaCount: 1
+  
+  image:
+    repository: pdevfig/front-temp
+    tag: 0.1.1
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: http
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  
+  probes:
+    startup:
+      path: /
+      periodSeconds: 5
+      timeoutSeconds: 2
+      failureThreshold: 30
+  
+    readiness:
+      path: /
+      periodSeconds: 20
+      timeoutSeconds: 2
+      failureThreshold: 3
+    
+    liveness:
+      path: /
+      periodSeconds: 10
+      timeoutSeconds: 2
+      failureThreshold: 2
+    
+  securityContext:
+    runAsNonRoot: false
+  
+backend:
+  replicaCount: 1
+  
+  image:
+    repository: pdevfig/temp-api-dhi
+    tag: 0.1.2
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 9000
+    targetPort: 80
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  
+  probes:
+    startup:
+      path: /
+      periodSeconds: 5
+      timeoutSeconds: 2
+      failureThreshold: 30
+    
+    readiness:
+      path: /
+      periodSeconds: 10
+      timeoutSeconds: 2
+      failureThreshold: 3
+     
+    liveness:
+      path: /
+      periodSeconds: 20
+      timeoutSeconds: 2
+      failureThreshold: 3
+    
+    securityContext:
+      runAsNonRoot: false
+
+# security context
+securityContext:
+  pod:
+    seccompProfile:
+      type: RuntimeDefault
+  
+  container:
+    allowPrivilegeEscalation: false
+    capabilties:
+      drop: 
+        - ALL
+  

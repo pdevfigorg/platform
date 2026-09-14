@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ include "myapp.fullname" . }}-frontend
+  labels:
+    {{- include "myapp.labels" . | nindent 4 }}
+    app.kuberntes.io/name: frontend
+    app.kuberntes.io/component: web
+
+spec:
+  replicas: {{ .Values.frontend.replicaCount }}
+
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+       maxUnavailable: 0
+       maxSurge: 1
+
+  selector:
+    matchLabels:
+      app.kubernets.io/name: frontend
+      app.kubernetes.io/part-of: myapp
+    
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/name: frontend
+          app.kubernetes.io/component: web
+          app.kubernetes.io/part-of: myapp
+      spec:
+        terminationGracePeriodSeconds: 30
+
+        securityContext:
+          {{- toYaml .Values.securityContext.pod | nindent 10 -}}
+
+        containers:
+          - name: frontend
+            image: {{ .Values.frontend.image.repository -}} : {{- .Values.frontend.image.tag -}}
+            imagePullPolicy: {{ .Values.frontend.image.pullPOlicy }}
+            ports:
+              - name: http
+                containerPort: 80
+                protocol: TCP
+              
+            securityContext:
+              {{- toYaml .Values.securityContext.container | nindent 14 -}}
+          
+            startupProbe:
+              httpGet:
+                path: {{ .Values.frontend.probes.startup.path }}
+                port: http
+              periodSeconds: {{ .Values.frontend.probes.startup.periodSeconds }}
+              timeoutSeconds: {{ .Values.frontend.probes.startup.timeoutSeconds }}
+              failureThreshold: {{ .Values.frontend.probes.startup.failureThreshold }}
+
+            readinessProbe:
+              httpGet:
+                path: {{ .Values.frontend.probes.readiness.path }}
+                port: http
+              periodSeconds: {{ .Values.frontend.probes.readiness.periodSeconds }}
+              timeoutSeconds: {{ .Values.frontend.probes.readiness.timeoutSeconds }}
+              failureThreshold: {{ .Values.frontend.probes.readiness.failureThreshold }}
+
+            livenessProbe:
+              httpGet:
+                path: {{ .Values.frontend.probes.liveness.path }}
+                port: http
+              periodSeconds: {{ .Values.frontend.probes.liveness.periodSeconds }}
+              timeoutSeconds: {{ .Values.frontend.probes.liveness.timeoutSeconds }}
+              failureThreshold: {{ .Values.frontend.probes.liveness.failureThreshold }}    
+            
+            resources:
+              {{- toYaml .Values.frontend.resources | nindent 14 -}}
