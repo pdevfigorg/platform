@@ -67,25 +67,25 @@ backend:
   
   probes:
     startup:
-      path: /
+      path: /healthz
       periodSeconds: 5
       timeoutSeconds: 2
       failureThreshold: 30
     
     readiness:
-      path: /
+      path: /healthz
       periodSeconds: 10
       timeoutSeconds: 2
       failureThreshold: 3
      
     liveness:
-      path: /
+      path: /healthz
       periodSeconds: 20
       timeoutSeconds: 2
       failureThreshold: 3
     
-    securityContext:
-      runAsNonRoot: false
+  securityContext:
+    runAsNonRoot: false
 
 # security context
 securityContext:
