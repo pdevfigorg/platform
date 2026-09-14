@@ -39,9 +39,9 @@ spec:
       app.kubernetes.io/name: backend
       app.kubernetes.io/part-of: myapp
   
-  securityContext:
-    seccompProfile:
-      type: RuntimeDefault
+  # securityContext:
+  #   seccompProfile:
+  #     type: RuntimeDefault
   
   template:
     metadata:
@@ -93,6 +93,8 @@ spec:
               drop:
                 - ALL
             runAsNonRoot: True
+            seccompProfile:
+              type: RuntimeDefault
 ---
 # frontend service
 apiVersion: v1
@@ -131,9 +133,9 @@ spec:
       app.kubernetes.io/name: frontend
       app.kubernetes.io/part-of: myapp
     
-  securityContext:
-    seccompProfile:
-      type: RuntimeDefault
+  # securityContext:
+  #   seccompProfile:
+  #     type: RuntimeDefault
   
   template:
     metadata:
@@ -155,6 +157,8 @@ spec:
               drop:
                 - ALL
             runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           
           resources:
             requests:
