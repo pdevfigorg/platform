@@ -1,0 +1,74 @@
+name: Promote Application
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "Source environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+    
+      target:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - staging
+          - prod
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  promote:
+    name: Promote ${{ inputs.source }} -> ${{ inputs.target }}
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ inputs.target == 'prod' && 'production' || 'staging' }}
+    
+    steps:
+      - name: Validate promotion
+        run: |
+          if [ "${{ inputs.source }}" = "${{ inputs.target }}"]; then
+            echo "Source and target cannot be tha same."
+            exit 1
+          fi
+        
+          if [ "${{ inputs.source }}" = "staging" ] && [ "${{ inputs.target }} != "prod" ]; then
+            echo "Invalid promotion path."
+            exit 1
+          fi
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Configure git
+        run: |
+          git config user.name "github-action[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Prmote image versions
+        env:
+          SOURCE: ${{ inputs.source }}
+          TARGET: ${{ inputs.target }}
+        run: |
+          python - <<'py'
+          from pathlib import Path
+          import os
+          import re
+
+          source = os.environ["SOURCE"]
+          target = os.environ["TARGET"]
+
+          source_file = Path(f"environments/{source}/values.yaml")
+          target_file = Path(f"environments/{target}/values.yaml")
+
+          source_text = source_file.read_text()
+          target_text = target_file.read_text()
+
+          
+
