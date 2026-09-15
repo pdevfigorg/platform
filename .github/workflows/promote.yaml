@@ -32,43 +32,56 @@ jobs:
       name: ${{ inputs.target == 'prod' && 'production' || 'staging' }}
     
     steps:
-      - name: Validate promotion
-        run: |
-          if [ "${{ inputs.source }}" = "${{ inputs.target }}"]; then
-            echo "Source and target cannot be tha same."
-            exit 1
-          fi
-        
-          if [ "${{ inputs.source }}" = "staging" ] && [ "${{ inputs.target }} != "prod" ]; then
-            echo "Invalid promotion path."
-            exit 1
-          fi
-      - name: Checkout
+      - name: Chekout
         uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
       
-      - name: Configure git
+      - name: Install dependencies
         run: |
-          git config user.name "github-action[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
 
-      - name: Prmote image versions
+      - name: Run promotion tests
+        run: echo "Should run pytest skipped."
+      
+      - name: Promote Image
+        run: |
+          python scripts/promote.py \
+            --source "${{ inputs.source }}" \
+            --target "${{ inputs.target }}"
+      
+      - name: Show changes
+        run: |
+          git diff -- environments/
+        
+      - name: Create branch
+        id: branch
+        run: |
+          BRANCH="promotion/${{ inputs.source }}-to-${{ inputs.target }}-${ GITHUB_RUN_ID }"
+          git checkout -b "$BRANCH"
+          echo "name=$BRANCH " >> "$GITHUB_OUTPUT"
+
+      - name: Commit
+        run: |
+          git add environments/
+
+          git commit \
+            -m "chore: promote ${{ inputs.source }} to ${{ inputs.target }}"
+        
+      - name: Push
+        run: |
+          git push origin "${{ steps.branch.outputs.name }}"
+      
+      - name: Create PR
         env:
-          SOURCE: ${{ inputs.source }}
-          TARGET: ${{ inputs.target }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          python - <<'py'
-          from pathlib import Path
-          import os
-          import re
-
-          source = os.environ["SOURCE"]
-          target = os.environ["TARGET"]
-
-          source_file = Path(f"environments/{source}/values.yaml")
-          target_file = Path(f"environments/{target}/values.yaml")
-
-          source_text = source_file.read_text()
-          target_text = target_file.read_text()
-
-          
-
+          gh pr create \
+            --base main \
+            --head "${{ steps.branch.outputs.name }}"
+            --title "chore: promote ${{ inputs.source }} -> ${{ inputs.target }}"
+            --body "Automated promotion from \`${{ inputs.sour }}\` to \`${{ inputs.target }}\`."

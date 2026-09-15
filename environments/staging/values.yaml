@@ -1,0 +1,9 @@
+frontend:
+  image:
+    repository: pdevfig/front-temp
+    tag: REPLACE_ME
+
+backend:
+  image:
+    repository: pdevfig/temp-api-dhi
+    tag: REPLACE_ME
