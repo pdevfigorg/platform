@@ -1,0 +1,52 @@
+name: GitOps Validate
+
+on:
+  pull_request:
+    paths:
+      - "charts/**"
+      - "environments/**"
+      - "argocd/**"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+
+jobs:
+  helm:
+    name: Helm validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Helm lint
+        run: |
+          helm lint charts/myapp -f environments/dev/values.yaml
+
+      - name: Render dev
+        run: |
+          helm template myapp charts/myapp \
+          -f environments/dev/values.yaml \
+          > /tmp/dev-rendered.yaml
+      
+      - name: Render staging
+        run: |
+          helm template myapp charts/myapp \
+          -f environments/staging/values.yaml \
+          > /tmp/staging-rendered.yaml
+      
+      - name: Render production
+        run: |
+          helm template myapp charts/myapp \
+          -f environments/prod/values.yaml \
+          > /tmp/prod-rendered.yaml
+      
+      - name: Validate rendered manifests
+        run: |
+          test -s /tmp/dev-rendered.yaml
+          test -s /tmp/staging-rendered.yaml
+          test -s /tmp/prod-rendered.yaml

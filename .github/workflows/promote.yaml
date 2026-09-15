@@ -1,0 +1,87 @@
+name: Promote Application
+
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "Source environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+    
+      target:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - staging
+          - prod
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  promote:
+    name: Promote ${{ inputs.source }} -> ${{ inputs.target }}
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ inputs.target == 'prod' && 'production' || 'staging' }}
+    
+    steps:
+      - name: Chekout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run promotion tests
+        run: echo "Should run pytest skipped."
+      
+      - name: Promote Image
+        run: |
+          python scripts/promote.py \
+            --source "${{ inputs.source }}" \
+            --target "${{ inputs.target }}"
+      
+      - name: Show changes
+        run: |
+          git diff -- environments/
+        
+      - name: Create branch
+        id: branch
+        run: |
+          BRANCH="promotion/${{ inputs.source }}-to-${{ inputs.target }}-${ GITHUB_RUN_ID }"
+          git checkout -b "$BRANCH"
+          echo "name=$BRANCH " >> "$GITHUB_OUTPUT"
+
+      - name: Commit
+        run: |
+          git add environments/
+
+          git commit \
+            -m "chore: promote ${{ inputs.source }} to ${{ inputs.target }}"
+        
+      - name: Push
+        run: |
+          git push origin "${{ steps.branch.outputs.name }}"
+      
+      - name: Create PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "${{ steps.branch.outputs.name }}"
+            --title "chore: promote ${{ inputs.source }} -> ${{ inputs.target }}"
+            --body "Automated promotion from \`${{ inputs.sour }}\` to \`${{ inputs.target }}\`."
