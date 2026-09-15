@@ -24,7 +24,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: backend
-        app.kubernetes.io/componenet: api
+        app.kubernetes.io/component: api
         app.kubernetes.io/part-of: myapp
     spec:
       terminationGracePeriodSeconds: 30
