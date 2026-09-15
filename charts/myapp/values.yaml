@@ -99,3 +99,29 @@ securityContext:
       drop: 
         - ALL
   
+# gateway related
+gateway:
+  # true wheather nginx gateway is present
+  nginxGateway: true 
+  gatewayClassName: nginx
+  listeners:
+    name: http
+    protocol: HTTP
+    port: 80
+  
+httpRoute:
+  rules:
+    backend:
+      path:
+        pathType: PathPrefix
+        value: /api
+      filter:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+    frontend:
+      path:
+        pathType: PathPrefix
+        value: /
