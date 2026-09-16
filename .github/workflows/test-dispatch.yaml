@@ -1,0 +1,24 @@
+name: test-dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      number:
+        required: true
+        type: number
+      
+
+jobs:
+  print-to-summary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo to github step summary
+        run: |
+          echo " Preview environment " >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Preview: https://pr-${{ inputs.number }}.myapp.example.com" >> "GITHUB_STEP_SUMMARY"
+      - name: echo with clikable
+        run: |
+          echo " Preview environment " >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[Open Preview](Preview: https://pr-${{ inputs.number }}.myapp.example.com)" >> "GITHUB_STEP_SUMMARY"
+          
