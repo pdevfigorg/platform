@@ -6,7 +6,7 @@ frontend:
   
   image:
     repository: pdevfig/front-temp
-    tag: 0.1.1
+    tag: 86189788c05a87701134653ee6ec23bc4b88c51c
     pullPolicy: IfNotPresent
   
   service:
