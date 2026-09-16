@@ -13,9 +13,10 @@ jobs:
     steps:
       - name: echo to github step summary
         run: |
-          echo " Preview environment " >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Preview: https://pr-${{ inputs.number }}.myapp.example.com" >> "GITHUB_STEP_SUMMARY"
+          {
+          echo " Preview environment " 
+          echo ""
+          echo "Preview: https://pr-${{ inputs.number }}.myapp.example.com" }>> "GITHUB_STEP_SUMMARY"
       - name: echo with clikable
         run: |
           echo " Preview environment " >> "$GITHUB_STEP_SUMMARY"
