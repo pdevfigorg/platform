@@ -24,4 +24,21 @@ jobs:
           echo " Preview environment " >> "$GITHUB_STEP_SUMMARY"
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "[Open Preview](Preview: https://pr-${{ inputs.number }}.myapp.example.com)" >> "GITHUB_STEP_SUMMARY"
+  second-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Web UI Summary
+        run: |
+          cat << 'EOF' >> $GITHUB_STEP_SUMMARY
+          ### 🚀 Deployment Status
+          The build was successful!
           
+          - **Version:** 1.2.0
+          - **Environment:** Production
+          
+          | Metric | Value | Status |
+          | --- | --- | --- |
+          | Code Coverage | 92% | ✅ |
+          | Bundled Size | 1.4 MB | ⚠️ |
+          EOF
+
